@@ -319,9 +319,9 @@
     <a href="https://github.com/Rcipolletta/SubconsciousStudy" target="_blank">GitHub</a>
   </div>
   <div class="nav-lang">
-    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <button class="lang-btn active" onclick="setLang('en', true)">EN</button>
     <span style="color:var(--divider)">|</span>
-    <button class="lang-btn" onclick="setLang('it')">IT</button>
+    <button class="lang-btn" onclick="setLang('it', true)">IT</button>
   </div>
 </nav>
 
@@ -330,7 +330,7 @@
   <h1>Subconscious Study</h1>
   <div class="hero-body">
     <div class="hero-left">
-      <p class="hero-tagline">Learning on <em>autopilot</em>.</p>
+      <p class="hero-tagline" data-en="Learning on <em>autopilot</em>." data-it="Metti il <em>pilota automatico</em> al tuo studio.">Learning on <em>autopilot</em>.</p>
       <p class="hero-sub" data-en="Like the popup ads you know by heart.<br>You load your notes and files, Subconscious Study shows them to you in small popups throughout the day." data-it="Come le pubblicità popup che conosci a memoria.<br>Tu carichi i tuoi appunti, Subconscious Study te li mostra in piccoli popup.">Like the popup ads you know by heart.<br>You load your notes and files, Subconscious Study shows them to you in small popups throughout the day.</p>
       <div class="hero-cta-wrap">
         <a class="hero-cta" href="https://github.com/Rcipolletta/SubconsciousStudy/releases/latest">
@@ -420,7 +420,7 @@
 </footer>
 
 <script>
-  function setLang(lang) {
+  function setLang(lang, fromUser) {
     document.querySelectorAll('[data-en]').forEach(el => {
       if (lang === 'it' && el.dataset.it) {
         el.innerHTML = el.dataset.it;
@@ -429,11 +429,24 @@
       }
     });
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
     document.documentElement.lang = lang;
     var sc = document.getElementById("hero-screenshot");
-    if (sc) sc.src = lang === "it" ? sc.dataset.srcIt : sc.dataset.srcEn;
+    if (sc) {
+      var srcIt = sc.getAttribute("data-src-it");
+      var srcEn = sc.getAttribute("data-src-en");
+      sc.src = (lang === "it" && srcIt) ? srcIt : (srcEn || sc.src);
+    }
+    if (fromUser) localStorage.setItem('lang', lang);
   }
+
+  // Auto-detect: saved preference → browser language → default EN
+  (function() {
+    var saved = localStorage.getItem('lang');
+    if (saved) { setLang(saved); return; }
+    var bl = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    if (bl.startsWith('it')) setLang('it');
+  })();
 </script>
 
 </body>
