@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Subconscious Study — learning on autopilot. Passive study tool for Windows."/>
+  <title>Subconscious Study</title>
+  <meta property="og:title" content="Subconscious Study"/>
+  <meta property="og:description" content="Learning on autopilot. Load your notes, get small popups throughout the day. Free, no paywall."/>
+  <meta property="og:image" content="app_screenshot_eng.png"/>
+  <meta property="og:type" content="website"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0C1117;
+      --bg2:       #131B24;
+      --card:      #172030;
+      --accent:    #5CADE7;
+      --accent2:   #3D8CC4;
+      --text:      #E8EDF2;
+      --muted:     #6B8299;
+      --divider:   #1E2D3D;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(12, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--divider);
+    }
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+    }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-lang { display: flex; align-items: center; gap: 6px; }
+    .lang-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 13px; font-family: inherit; font-weight: 500; padding: 2px 4px; transition: color .2s; }
+    .lang-btn.active, .lang-btn:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 96px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 55% at 50% 0%, rgba(92,173,231,.18) 0%, transparent 60%), radial-gradient(ellipse 40% 30% at 75% 80%, rgba(61,140,196,.10) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(48px, 8vw, 88px);
+      font-weight: 400;
+      line-height: 1.04;
+      letter-spacing: -.02em;
+      margin-bottom: 8px;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-tagline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(17px, 2.2vw, 24px);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 0;
+      opacity: 0.75;
+    }
+    .hero-tagline em { color: var(--accent); font-style: italic; }
+    .hero-sub {
+      font-size: clamp(13px, 1.8vw, 15px);
+      color: var(--muted);
+      max-width: 480px;
+      margin: 8px 0 28px;
+      font-weight: 300;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 100px;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 24px rgba(92,173,231,.25);
+    }
+    .hero-cta-wrap { display: inline-flex; flex-direction: column; align-items: center; }
+    .hero-cta:hover { background: var(--accent2); transform: translateY(-2px); }
+    .hero-cta svg { width: 18px; height: 18px; }
+    .hero-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* ── HERO BODY ── */
+    .hero-body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      width: 100%;
+      max-width: 960px;
+      margin-top: 8px;
+    }
+    .hero-left {
+      flex: 1;
+      min-width: 0;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .screenshot-wrap {
+      flex-shrink: 0;
+      width: 480px;
+    }
+    .screenshot-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--card);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ── SECTION ── */
+    section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 96px 24px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    section h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 400;
+      margin-bottom: 20px;
+    }
+    section p {
+      color: var(--muted);
+      max-width: 560px;
+      font-size: 16px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 48px;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 28px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+    .step:first-child { border-top: 1px solid var(--divider); }
+    .step-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: var(--accent);
+      opacity: .6;
+      line-height: 1.6;
+      min-width: 24px;
+      padding-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .step p {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: none;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 48px;
+    }
+    .feature {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--divider);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .feature-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+    .feature p { font-size: 14px; color: var(--muted); max-width: none; }
+    .feature strong { color: var(--text); display: block; margin-bottom: 4px; }
+
+    /* ── DIVIDER ── */
+    hr { border: none; border-top: 1px solid var(--divider); }
+
+
+    /* ── PREFOOTER ── */
+    .prefooter {
+      text-align: center;
+      padding: 80px 24px 72px;
+      border-top: 1px solid var(--divider);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .prefooter h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 400;
+      margin-bottom: 12px;
+    }
+    .prefooter p {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 400px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--divider);
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── LANG ── */
+    [data-lang="it"] { display: none; }
+
+    @media (max-width: 700px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 80px 24px 48px; }
+      .hero-body { flex-direction: column; text-align: center; gap: 32px; }
+      .hero-left { align-items: center; text-align: center; }
+      .screenshot-wrap { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">Subconscious Study</a>
+  <div class="nav-links">
+    <a href="#how" data-en="How it works" data-it="Come funziona">How it works</a>
+    <a href="#features" data-en="Features" data-it="Funzionalità">Features</a>
+    <a href="https://github.com/Rcipolletta/SubconsciousStudy" target="_blank">GitHub</a>
+  </div>
+  <div class="nav-lang">
+    <button class="lang-btn active" onclick="setLang('en')">EN</button>
+    <span style="color:var(--divider)">|</span>
+    <button class="lang-btn" onclick="setLang('it')">IT</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Subconscious Study</h1>
+  <div class="hero-body">
+    <div class="hero-left">
+      <p class="hero-tagline">Learning on <em>autopilot</em>.</p>
+      <p class="hero-sub" data-en="Like the popup ads you know by heart.<br>You load your notes and files, Subconscious Study shows them to you in small popups throughout the day." data-it="Come le pubblicità popup che conosci a memoria.<br>Tu carichi i tuoi appunti, Subconscious Study te li mostra in piccoli popup.">Like the popup ads you know by heart.<br>You load your notes and files, Subconscious Study shows them to you in small popups throughout the day.</p>
+      <div class="hero-cta-wrap">
+        <a class="hero-cta" href="https://github.com/Rcipolletta/SubconsciousStudy/releases/latest">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span data-en="Download for Windows" data-it="Scarica per Windows">Download for Windows</span>
+        </a>
+        <p class="hero-note" data-en="Free! No premium features or paywalls." data-it="Gratis! Nessuna funzione premium o paywall.">Free! No premium features or paywalls.</p>
+      </div>
+    </div>
+    <div class="screenshot-wrap">
+      <img id="hero-screenshot" src="app_screenshot_eng.png" data-src-en="app_screenshot_eng.png" data-src-it="app_screenshot_ita.png" alt="Subconscious Study" style="width:100%;display:block;"/>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <p class="section-label" data-en="How it works" data-it="Come funziona">How it works</p>
+  <h2 data-en="Easy and fast start." data-it="Setup semplice e veloce.">Easy and fast start.</h2>
+  <div class="steps">
+        <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <h3 data-en="Load your files" data-it="Carica i tuoi file">Load your files</h3>
+        <p data-en="Drop in .txt, .md, .pdf, or .docx files — your notes, vocabulary, anything." data-it="Carica file .txt, .md, .pdf o .docx: appunti, vocabolario, qualsiasi cosa.">Drop in .txt, .md, .pdf, or .docx files.</p>
+      </div>
+    </div>
+        <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <h3 data-en="Set your interval" data-it="Imposta l'intervallo">Set your interval</h3>
+        <p data-en="Every few minutes or every hour. Choose what fits your day." data-it="Ogni pochi minuti o ogni ora. Scegli quello che si adatta alla tua giornata.">Every few minutes or every hour. Your call.</p>
+      </div>
+    </div>
+        <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <h3 data-en="Do something else" data-it="Dedicati a ciò che ami">Do something else</h3>
+        <p data-en="Learn the way you memorised the jingle you never asked to remember." data-it="I popup faranno il resto. Memorizzerai i tuoi appunti come il jingle che non hai mai chiesto di ricordare.">Learn the way you memorised the jingle you never asked to remember.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr/>
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="section-label" data-en="Features" data-it="Funzionalità">Features</p>
+  <h2 data-en="Adapt it to your workflow." data-it="Adattalo al tuo flusso di lavoro.">Adapt it to your workflow.</h2>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-dot"></div>
+      <div>
+        <strong data-en="Resizable popups" data-it="Popup ridimensionabili">Resizable popups</strong>
+        <p data-en="Move and resize them however you like." data-it="Spostali e ridimensionali come ti sono più comodi.">Move and resize them however you like.</p>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-dot"></div>
+      <div>
+        <strong data-en="Feature requests" data-it="Richieste di funzionalità">Feature requests</strong>
+        <p data-en="If you need something, just hit the button in the app." data-it="Se hai bisogno di qualcosa, clicca su 'Richiedi una funzione'">If you need something, just hit the button in the app.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="prefooter">
+  <h2 data-en="Download the app." data-it="Scarica l'app.">Download the app.</h2>
+  <p data-en="Ready to study smarter?" data-it="Inizia a sfruttare il subconscio.">Ready to study smarter?</p>
+  <a class="hero-cta" href="https://github.com/Rcipolletta/SubconsciousStudy/releases/latest" style="margin-top:32px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+    <span data-en="Download for Windows" data-it="Scarica per Windows">Download for Windows</span>
+  </a>
+</section>
+
+<footer>
+  <p>Made with ♥ by <a href="https://github.com/Rcipolletta" target="_blank">Riccardo Cipolletta</a> &nbsp;·&nbsp;
+  <a href="https://github.com/Rcipolletta/SubconsciousStudy" target="_blank">GitHub</a></p>
+</footer>
+
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('[data-en]').forEach(el => {
+      if (lang === 'it' && el.dataset.it) {
+        el.innerHTML = el.dataset.it;
+      } else {
+        el.innerHTML = el.dataset.en;
+      }
+    });
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.documentElement.lang = lang;
+    var sc = document.getElementById("hero-screenshot");
+    if (sc) sc.src = lang === "it" ? sc.dataset.srcIt : sc.dataset.srcEn;
+  }
+</script>
+
+</body>
+</html>
