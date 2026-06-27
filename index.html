@@ -7,7 +7,7 @@
   <title>Subconscious Study</title>
   <meta property="og:title" content="Subconscious Study"/>
   <meta property="og:description" content="Learning on autopilot. Load your notes, get small popups throughout the day. Free, no paywall."/>
-  <meta property="og:image" content="app_screenshot_eng.png"/>
+  <meta property="og:image" content="https://rcipolletta.github.io/SubconsciousStudy/app_screenshot_eng.png"/>
   <meta property="og:type" content="website"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -429,7 +429,9 @@
       }
     });
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      if (b.textContent.trim().toLowerCase() === lang) b.classList.add('active');
+    });
     document.documentElement.lang = lang;
     var sc = document.getElementById("hero-screenshot");
     if (sc) {
